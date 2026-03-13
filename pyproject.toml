@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "private-targeting"
+version = "0.1.0"
+description = "Python package for private targeting estimators from the accompanying academic paper"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "UNLICENSED"}
+authors = [
+  {name = "Add your author names here"}
+]
+keywords = ["differential privacy", "causal inference", "treatment effects", "targeting", "marketing"]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "scikit-learn>=1.3"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: Other/Proprietary License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.optional-dependencies]
+ml = [
+  "tensorflow>=2.13"
+]
+tuning = [
+  "keras-tuner>=1.4"
+]
+privacy = [
+  "tensorflow-privacy>=0.9"
+]
+full = [
+  "tensorflow>=2.13",
+  "keras-tuner>=1.4",
+  "tensorflow-privacy>=0.9"
+]
+dev = [
+  "pytest>=8.0",
+  "build>=1.2"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/private-targeting"
+Repository = "https://github.com/your-org/private-targeting"
+Issues = "https://github.com/your-org/private-targeting/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
