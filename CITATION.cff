@@ -4,10 +4,9 @@ title: "private-targeting"
 version: "0.1.0"
 type: software
 authors:
-  - family-names: "Add"
-    given-names: "Authors Here"
-repository-code: "https://github.com/your-org/private-targeting"
+  - family-names: "Ponte"
+    given-names: "Gilian"
+repository-code: "https://github.com/GilianPonte/private-targeting"
 abstract: >-
-  Python package for the training-stage private targeting estimator from the
-  accompanying academic paper. This release includes CTENN / DP-CATE style
+  Python package for the training-stage private targeting estimator from the paper. This release includes CTENN / DP-CATE style
   estimators packaged from the provided implementation.
