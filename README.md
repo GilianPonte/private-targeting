@@ -47,7 +47,7 @@ Install the released version from GitHub:
 
 ```python
 %pip install --upgrade pip setuptools wheel
-%pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"
+%pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"
 ```
 
 After installation, restart the Colab runtime:
@@ -167,7 +167,7 @@ private-targeting-env\Scripts\activate.bat
 
 python -m pip install --upgrade pip setuptools wheel
 
-pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"
+pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"
 ```
 
 Check that the package imports correctly:
@@ -185,7 +185,7 @@ source private-targeting-env/bin/activate
 
 python -m pip install --upgrade pip setuptools wheel
 
-pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"
+pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"
 ```
 
 Check that the package imports correctly:
@@ -198,8 +198,8 @@ python -c "from private_targeting import CTENN, DP_CATE, DP_policy; print('Impor
 
 | Use case                               | Recommended command                                                                                        |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Try in Google Colab                    | `%pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"` |
-| Install locally on Windows/macOS/Linux | `pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"`  |
+| Try in Google Colab                    | `%pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"` |
+| Install locally on Windows/macOS/Linux | `pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"`  |
 | Install latest GitHub version          | `pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git"`         |
 
 ## Fast example with plots
