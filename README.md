@@ -1,20 +1,22 @@
-# private-targeting
+# DP-CATE and DP-policy
 
-Python package for the training-stage private targeting estimator from the accompanying
-academic paper.
+Python package for private targeting with `CTENN`, `DP_CATE`, and `DP_policy` from the paper:
+
+> Ponte, Gilian R., Tom Boot, Thomas Reutterer, and Jaap E. Wieringa. “EXPRESS: Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability.” *Journal of Marketing Research*, 2026. DOI: 10.1177/00222437261455302.
 
 ## Current scope
 
-This package turns the estimator code you shared into an installable Python package.
-It currently includes the **CTENN / DP-CATE** estimator family:
+This package exposes three public functions:
 
-- `cnn`: original non-private estimator name from your code
-- `pcnn`: original private estimator name from your code
-- `ctenn`: paper-aligned alias for `cnn`
-- `dp_cate`: paper-aligned alias for `pcnn`
+* `CTENN`: non-private CATE estimator.
+* `DP_CATE`: differentially private CATE estimator.
+* `DP_policy`: randomized-response targeting policy evaluation.
 
-The **DP-policy** strategy from the paper is **not implemented in this package yet**,
-because its code was not included in the snippet you provided.
+## Python version
+
+Use Python **3.10 or 3.11**.
+
+The full machine-learning stack depends on `tensorflow-privacy==0.9.0`, which requires Python `<3.12`. Python 3.11 is recommended.
 
 ## Installation
 
@@ -24,61 +26,140 @@ Base install:
 pip install .
 ```
 
-With machine-learning dependencies:
+With machine-learning and tutorial dependencies:
 
 ```bash
-pip install .[full]
+pip install ".[full]"
 ```
 
 Editable install for development:
 
 ```bash
-pip install -e .[dev,full]
+pip install -e ".[dev,full]"
+```
+
+## Clean local setup on Windows Command Prompt
+
+```bat
+cd /d "C:\Users\gilia\Dropbox\Projects\3rd project - targeting\private-targeting"
+
+py -3.11 -m venv .venv
+
+.venv\Scripts\activate.bat
+
+python -m pip install --upgrade pip setuptools wheel
+
+pip install -e ".[dev,full]"
+```
+
+Check that the package imports correctly:
+
+```bat
+python -c "from private_targeting import CTENN, DP_CATE, DP_policy; print('Import works')"
+```
+
+## Clean local setup on macOS or Linux
+
+```bash
+cd /path/to/private-targeting
+
+python3.11 -m venv .venv
+
+source .venv/bin/activate
+
+python -m pip install --upgrade pip setuptools wheel
+
+pip install -e ".[dev,full]"
+```
+
+Check that the package imports correctly:
+
+```bash
+python -c "from private_targeting import CTENN, DP_CATE, DP_policy; print('Import works')"
 ```
 
 ## Quick start
 
 ```python
 import numpy as np
-from private_targeting import ctenn, dp_cate
 
-n = 200
-p = 10
-rng = np.random.default_rng(42)
+from private_targeting import CTENN, DP_CATE, DP_policy
+
+rng = np.random.default_rng(1)
+
+n = 100
+p = 5
+
 X = rng.normal(size=(n, p))
 T = rng.binomial(1, 0.5, size=n)
-Y = 0.5 * T + X[:, 0] + rng.normal(size=n)
 
-ate, cate, model = ctenn(
-    X,
-    Y,
-    T,
-    epochs=5,
-    max_epochs=2,
+true_cate = 1 + 0.5 * X[:, 0] - 0.25 * X[:, 1]
+Y = 2 + X[:, 0] + X[:, 1] + T * true_cate + rng.normal(scale=1, size=n)
+
+ate_ctenn, cate_ctenn, model_ctenn = CTENN(
+    X=X,
+    Y=Y,
+    T=T,
     folds=2,
-    seed=42,
+    epochs=1,
+    max_epochs=1,
+    batch_size=10,
+    seed=1,
 )
 
-# Private version
-# ate, cate, model, n, epsilon, noise_multiplier, epsilon_conservative = dp_cate(
-#     X,
-#     Y,
-#     T,
-#     epochs=5,
-#     max_epochs=1,
-#     batch_size=50,
-#     noise_multiplier=1.0,
-#     seed=42,
-# )
+ate_dp, cate_dp, model_dp, n_dp, epsilon, noise, epsilon_conservative = DP_CATE(
+    X=X,
+    Y=Y,
+    T=T,
+    epochs=1,
+    max_epochs=1,
+    batch_size=10,
+    noise_multiplier=1.0,
+    fixed_model=True,
+    seed=1,
+)
+
+policy_results = DP_policy(
+    iterations=2,
+    percentage=[0.10, 0.20],
+    CATE=true_cate,
+    CATE_estimates=cate_ctenn,
+    epsilons=[0.5, 1, 3],
+    seed_offset=1,
+)
+
+print("CTENN ATE:", ate_ctenn)
+print("DP_CATE ATE:", ate_dp)
+print(policy_results)
 ```
+
+## Fast tutorial with plots
+
+After installing with `.[dev,full]`, run:
+
+```bash
+python examples/tutorial_fast.py
+```
+
+On Windows Command Prompt:
+
+```bat
+python examples\tutorial_fast.py
+```
+
+The tutorial creates a toy dataset, estimates CATEs with `CTENN` and `DP_CATE`, evaluates protected targeting with `DP_policy`, and opens two plots:
+
+1. estimated versus true CATEs;
+2. DP-policy profit above random targeting.
 
 ## Project layout
 
 ```text
-private_targeting_pkg/
+private-targeting/
 ├── pyproject.toml
 ├── README.md
-├── CITATION.cff
+├── examples/
+│   └── tutorial_fast.py
 ├── src/
 │   └── private_targeting/
 │       ├── __init__.py
@@ -87,29 +168,40 @@ private_targeting_pkg/
     └── test_api.py
 ```
 
-## Notes on the packaged code
-
-The package preserves the structure of your original implementation, while fixing a few
-issues that would otherwise break packaging or runtime behavior:
-
-- makes the project installable with a `src/` layout
-- fixes the undefined `noise_multiplier` filename reference in `cnn`
-- validates that `T` is binary
-- adds a clearer error for unstable pseudo-outcomes when residualized treatment is near zero
-- replaces the invalid Keras activation string `"leaky_relu"` with an explicit layer
-- keeps TensorFlow, Keras Tuner, and TensorFlow Privacy imports lazy inside the estimators
-
-## Before publishing
-
-You should still update these fields before making the repository public:
-
-- author names in `pyproject.toml`
-- GitHub URLs in `pyproject.toml`
-- license choice
-- version number
-
 ## Running tests
 
 ```bash
 pytest
+```
+
+## Notes
+
+TensorFlow on native Windows prints a warning that GPU support is not available for TensorFlow >= 2.11. That warning is expected; the fast tutorial runs on CPU.
+
+TensorFlow may also print oneDNN or CPU optimization messages. These are informational messages, not errors.
+
+To reduce TensorFlow log output on Windows Command Prompt, run:
+
+```bat
+set TF_CPP_MIN_LOG_LEVEL=2
+```
+
+Then rerun the tutorial:
+
+```bat
+python examples\tutorial_fast.py
+```
+
+## Citation
+
+If you use this package, please cite:
+
+```bibtex
+@article{ponte2026differentialprivacytargeting,
+  title   = {EXPRESS: Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability},
+  author  = {Ponte, Gilian R. and Boot, Tom and Reutterer, Thomas and Wieringa, Jaap E.},
+  journal = {Journal of Marketing Research},
+  year    = {2026},
+  doi     = {10.1177/00222437261455302}
+}
 ```
