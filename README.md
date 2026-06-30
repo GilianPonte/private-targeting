@@ -202,6 +202,28 @@ python -c "from private_targeting import CTENN, DP_CATE, DP_policy; print('Impor
 | Install locally on Windows/macOS/Linux | `pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"`  |
 | Install latest GitHub version          | `pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git"`         |
 
+## Fast example with plots
+
+After installing the package, the same example can be run as a script from the repository:
+
+```bash
+python examples/tutorial_fast.py
+```
+
+On Windows Command Prompt:
+
+```bat
+python examples\tutorial_fast.py
+```
+
+The tutorial creates a toy dataset, estimates CATEs with `CTENN` and `DP_CATE`, evaluates protected targeting with `DP_policy`, and opens two plots:
+
+1. estimated versus true CATEs;
+2. DP-policy profit above random targeting.
+
+The tutorial is designed as a fast smoke test. It uses very small training settings, so it is not intended to reproduce the empirical results from the paper.
+
+
 ## What the example does
 
 The quick-start example demonstrates the three main functions in the package.
@@ -273,47 +295,6 @@ The returned object is a pandas DataFrame with:
 * `iteration`: the simulation repetition.
 
 In the quick-start example, `DP_policy` evaluates targeting the top 10% and 20% of customers over two repeated randomized runs.
-
-## Requirements for the example
-
-The example requires Python **3.10 or 3.11**.
-
-The base package requires:
-
-* `numpy`
-* `pandas`
-* `scikit-learn`
-
-The full example also requires the machine-learning and plotting dependencies installed with:
-
-```bash
-pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@0.1.0"
-```
-
-The full installation includes TensorFlow, Keras Tuner, TensorFlow Privacy, TensorBoard, TensorFlow Probability, and Matplotlib.
-
-The example uses a small synthetic dataset so that it runs quickly. It is intended as a smoke test to check that the package works, not as a full empirical replication of the paper.
-
-## Fast tutorial with plots
-
-After installing the package, the same example can be run as a script from the repository:
-
-```bash
-python examples/tutorial_fast.py
-```
-
-On Windows Command Prompt:
-
-```bat
-python examples\tutorial_fast.py
-```
-
-The tutorial creates a toy dataset, estimates CATEs with `CTENN` and `DP_CATE`, evaluates protected targeting with `DP_policy`, and opens two plots:
-
-1. estimated versus true CATEs;
-2. DP-policy profit above random targeting.
-
-The tutorial is designed as a fast smoke test. It uses very small training settings, so it is not intended to reproduce the empirical results from the paper.
 
 ## Project layout
 
