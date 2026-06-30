@@ -20,21 +20,27 @@ The full machine-learning stack depends on `tensorflow-privacy==0.9.0`, which re
 
 ## Installation
 
-Base install:
+### Install from GitHub release
+
+To install the released version directly from GitHub:
 
 ```bash
-pip install .
+pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git@v0.1.0"
 ```
 
-With machine-learning and tutorial dependencies:
+### Install from the latest GitHub main branch
 
 ```bash
-pip install ".[full]"
+pip install "private-targeting[full] @ git+https://github.com/GilianPonte/private-targeting.git"
 ```
 
-Editable install for development:
+### Local development install
+
+Clone the repository and install it in editable mode:
 
 ```bash
+git clone https://github.com/GilianPonte/private-targeting.git
+cd private-targeting
 pip install -e ".[dev,full]"
 ```
 
@@ -128,6 +134,7 @@ policy_results = DP_policy(
     CATE_estimates=cate_ctenn,
     epsilons=[0.5, 1, 3],
     seed_offset=1,
+    verbose=False,
 )
 
 print("CTENN ATE:", ate_ctenn)
@@ -154,6 +161,8 @@ The tutorial creates a toy dataset, estimates CATEs with `CTENN` and `DP_CATE`, 
 1. estimated versus true CATEs;
 2. DP-policy profit above random targeting.
 
+The tutorial is designed as a fast smoke test. It uses very small training settings, so it is not intended to reproduce the empirical results from the paper.
+
 ## Project layout
 
 ```text
@@ -168,12 +177,6 @@ private-targeting/
 │       └── dp_cate.py
 └── tests/
     └── test_api.py
-```
-
-## Running tests
-
-```bash
-pytest
 ```
 
 ## Notes
@@ -200,7 +203,7 @@ If you use this package, please cite:
 
 ```bibtex
 @article{ponte2026differentialprivacytargeting,
-  title   = {Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability},
+  title   = {EXPRESS: Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability},
   author  = {Ponte, Gilian R. and Boot, Tom and Reutterer, Thomas and Wieringa, Jaap E.},
   journal = {Journal of Marketing Research},
   year    = {2026},
