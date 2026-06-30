@@ -137,7 +137,7 @@ def _check_t_tilde(values: np.ndarray) -> None:
 
 
 
-def cnn(
+def CTENN(
     X,
     Y,
     T,
@@ -184,7 +184,7 @@ def cnn(
         import keras_tuner
     except ImportError as e:
         raise ImportError(
-            "keras-tuner is required for cnn(). Install with: pip install keras-tuner"
+            "keras-tuner is required for CTENN(). Install with: pip install keras-tuner"
         ) from e
 
     from tensorflow import keras
@@ -347,7 +347,7 @@ def _parse_privacy_statement(statement: str) -> tuple[int, float, float, float]:
 
 
 
-def pcnn(
+def DP_CATE(
     X,
     Y,
     T,
@@ -383,7 +383,7 @@ def pcnn(
         import keras_tuner
     except ImportError as e:
         raise ImportError(
-            "keras-tuner is required for pcnn(). Install with: pip install keras-tuner"
+            "keras-tuner is required for pCTENN(). Install with: pip install keras-tuner"
         ) from e
 
     try:
@@ -396,12 +396,12 @@ def pcnn(
         )
     except ImportError as e:
         raise ImportError(
-            "tensorflow-privacy is required for pcnn(). Install with: "
+            "tensorflow-privacy is required for pCTENN(). Install with: "
             "pip install tensorflow-privacy"
         ) from e
 
     if noise_multiplier is None:
-        raise ValueError("noise_multiplier must be provided for pcnn().")
+        raise ValueError("noise_multiplier must be provided for DP_CATE().")
 
     _set_random_seed(seed)
     X_arr, Y_arr, T_arr = _validate_inputs(X, Y, T)
@@ -592,15 +592,4 @@ def pcnn(
 
 
 
-def ctenn(*args, **kwargs):
-    """Paper-aligned alias for :func:`cnn`."""
-    return cnn(*args, **kwargs)
-
-
-
-def dp_cate(*args, **kwargs):
-    """Paper-aligned alias for :func:`pcnn`."""
-    return pcnn(*args, **kwargs)
-
-
-__all__ = ["cnn", "pcnn", "ctenn", "dp_cate"]
+__all__ = ["CTENN", "DP_CATE"]
