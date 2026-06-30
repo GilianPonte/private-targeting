@@ -5,8 +5,6 @@ original function names (``cnn``, ``pcnn``) and paper-aligned aliases (``ctenn``
 ``dp_cate``).
 """
 
-from .dp_cate import cnn, ctenn, dp_cate, pcnn
+from .estimators import CTENN, DP_CATE, DP_policy
 
-__version__ = "0.1.0"
-
-__all__ = ["cnn", "pcnn", "ctenn", "dp_cate", "__version__"]
+__all__ = ["CTENN", "DP_CATE", "DP_policy"]
