@@ -206,8 +206,8 @@ def CTENN(
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
     build_model = _build_model_factory(X_arr.shape[1])
-    checkpoint_filepath_mx = checkpoint_dir / "cnn_m_x.keras"
-    checkpoint_filepath_taux = checkpoint_dir / "cnn_tau_x.keras"
+    checkpoint_filepath_mx = checkpoint_dir / "CTENN_m_x.keras"
+    checkpoint_filepath_taux = checkpoint_dir / "CTENN_tau_x.keras"
 
     mx_callbacks = _make_checkpoint_callbacks(checkpoint_filepath_mx, patience=5)
     tau_callbacks = _make_checkpoint_callbacks(checkpoint_filepath_taux, patience=5)
@@ -383,7 +383,7 @@ def DP_CATE(
         import keras_tuner
     except ImportError as e:
         raise ImportError(
-            "keras-tuner is required for pCTENN(). Install with: pip install keras-tuner"
+            "keras-tuner is required for DP_CATE(). Install with: pip install keras-tuner"
         ) from e
 
     try:
@@ -396,7 +396,7 @@ def DP_CATE(
         )
     except ImportError as e:
         raise ImportError(
-            "tensorflow-privacy is required for pCTENN(). Install with: "
+            "tensorflow-privacy is required for DP_CATE(). Install with: "
             "pip install tensorflow-privacy"
         ) from e
 
