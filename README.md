@@ -1,7 +1,7 @@
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)
 ![Release](https://img.shields.io/github/v/release/GilianPonte/private-targeting)
 ![License](https://img.shields.io/github/license/GilianPonte/private-targeting)
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](<COLAB_NOTEBOOK_URL>)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GilianPonte/private-targeting/blob/main/examples/private_targeting_colab_demo.ipynb)
 
 # Package for running the DP-CATE and DP-policy strategy,
 
