@@ -291,62 +291,6 @@ The full installation includes TensorFlow, Keras Tuner, TensorFlow Privacy, Tens
 
 The example uses a small synthetic dataset so that it runs quickly. It is intended as a smoke test to check that the package works, not as a full empirical replication of the paper.
 
-## Quick start
-
-```python
-import numpy as np
-
-from private_targeting import CTENN, DP_CATE, DP_policy
-
-rng = np.random.default_rng(1)
-
-n = 100
-p = 5
-
-X = rng.normal(size=(n, p))
-T = rng.binomial(1, 0.5, size=n)
-
-true_cate = 1 + 0.5 * X[:, 0] - 0.25 * X[:, 1]
-Y = 2 + X[:, 0] + X[:, 1] + T * true_cate + rng.normal(scale=1, size=n)
-
-ate_ctenn, cate_ctenn, model_ctenn = CTENN(
-    X=X,
-    Y=Y,
-    T=T,
-    folds=2,
-    epochs=1,
-    max_epochs=1,
-    batch_size=10,
-    seed=1,
-)
-
-ate_dp, cate_dp, model_dp, n_dp, epsilon, noise, epsilon_conservative = DP_CATE(
-    X=X,
-    Y=Y,
-    T=T,
-    epochs=1,
-    max_epochs=1,
-    batch_size=10,
-    noise_multiplier=1.0,
-    fixed_model=True,
-    seed=1,
-)
-
-policy_results = DP_policy(
-    iterations=2,
-    percentage=[0.10, 0.20],
-    CATE=true_cate,
-    CATE_estimates=cate_ctenn,
-    epsilons=[0.5, 1, 3],
-    seed_offset=1,
-    verbose=False,
-)
-
-print("CTENN ATE:", ate_ctenn)
-print("DP_CATE ATE:", ate_dp)
-print(policy_results)
-```
-
 ## Fast tutorial with plots
 
 After installing the package, the same example can be run as a script from the repository:
