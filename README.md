@@ -12,8 +12,6 @@ This package exposes three public functions:
 * `DP_CATE`: differentially private CATE estimator.
 * `DP_policy`: randomized-response targeting policy evaluation.
 
-The package intentionally does **not** export the older names `cnn`, `pcnn`, `ctenn`, or `dp_cate`.
-
 ## Python version
 
 Use Python **3.10 or 3.11**.
