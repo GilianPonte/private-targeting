@@ -239,9 +239,9 @@ The returned values are:
 * `noise`: the noise multiplier used during private optimization.
 * `epsilon_conservative`: a conservative privacy-loss estimate.
 
-The argument `noise_multiplier=1.0` controls how much noise is added during private training. Larger values usually imply stronger privacy but noisier estimates.
+The argument `noise_multiplier=1.0` controls how much noise is added during private training. Larger values usually imply stronger privacy (or lower epsilon from differential privacy) but noisier estimates.
 
-The argument `fixed_model=True` is used in the tutorial to make the example faster.
+The argument `fixed_model=True` is used in the tutorial to satisfy differential privacy.
 
 ### `DP_policy`
 
