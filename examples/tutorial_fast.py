@@ -19,7 +19,7 @@ from private_targeting import CTENN, DP_CATE, DP_policy
 
 rng = np.random.default_rng(1)
 
-n = 100
+n = 1000
 p = 5
 
 X = rng.normal(size=(n, p))
@@ -32,8 +32,8 @@ ate_ctenn, cate_ctenn, model_ctenn = CTENN(
     X=X,
     Y=Y,
     T=T,
-    folds=2,
-    epochs=1,
+    folds=10,
+    epochs=100,
     max_epochs=1,
     batch_size=10,
     seed=1,
@@ -45,9 +45,9 @@ ate_dp, cate_dp, model_dp, n_dp, epsilon, noise, epsilon_conservative = DP_CATE(
     X=X,
     Y=Y,
     T=T,
-    epochs=1,
+    epochs=100,
     max_epochs=1,
-    batch_size=10,
+    batch_size=100,
     noise_multiplier=1.0,
     fixed_model=True,
     seed=1,
@@ -59,10 +59,10 @@ print("epsilon conservative:", epsilon_conservative)
 
 policy_results = DP_policy(
     iterations=2,
-    percentage=[0.10, 0.20],
+    percentage=[0.05,0.10, 0.15, 0.20, 0.25, 0.3,0.35,0.4, 0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.90,0.95],
     CATE=true_cate,
     CATE_estimates=cate_ctenn,
-    epsilons=[0.5, 1, 3],
+    epsilons=[0.05, 0.5, 1, 3, 5],
     seed_offset=1,
     verbose=False,
 )
