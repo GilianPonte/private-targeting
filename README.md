@@ -41,7 +41,8 @@ pip install -e ".[dev,full]"
 ## Clean local setup on Windows Command Prompt
 
 ```bat
-cd /d "C:\Users\gilia\Dropbox\Projects\3rd project - targeting\private-targeting"
+git clone https://github.com/GilianPonte/private-targeting.git
+cd private-targeting
 
 py -3.11 -m venv .venv
 
@@ -61,7 +62,8 @@ python -c "from private_targeting import CTENN, DP_CATE, DP_policy; print('Impor
 ## Clean local setup on macOS or Linux
 
 ```bash
-cd /path/to/private-targeting
+git clone https://github.com/GilianPonte/private-targeting.git
+cd private-targeting
 
 python3.11 -m venv .venv
 
