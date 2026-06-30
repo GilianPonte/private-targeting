@@ -198,7 +198,7 @@ If you use this package, please cite:
 
 ```bibtex
 @article{ponte2026differentialprivacytargeting,
-  title   = {EXPRESS: Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability},
+  title   = {Where Should Firms Implement Differential Privacy in Targeting? Implications for Profitability},
   author  = {Ponte, Gilian R. and Boot, Tom and Reutterer, Thomas and Wieringa, Jaap E.},
   journal = {Journal of Marketing Research},
   year    = {2026},
