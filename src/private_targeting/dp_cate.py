@@ -592,4 +592,178 @@ def DP_CATE(
 
 
 
-__all__ = ["CTENN", "DP_CATE"]
+
+def _as_probability_array(values: Any, *, name: str) -> np.ndarray:
+    """Convert a scalar or vector of probabilities/epsilons to a 1D float array."""
+    if np.isscalar(values):
+        arr = np.array([values], dtype=float)
+    else:
+        arr = np.asarray(pd.DataFrame(values)).reshape(-1).astype(float)
+    if arr.size == 0:
+        raise ValueError(f"{name} must not be empty.")
+    return arr
+
+
+def _top_count(n: int, phi: float) -> int:
+    top = int(round(n * phi))
+    if top < 0 or top > n:
+        raise ValueError("percentage values must produce a target count between 0 and n.")
+    return top
+
+
+def _profit_nodp(CATE: np.ndarray, score: np.ndarray, phi: float, rng: np.random.Generator) -> float:
+    """Profit from deterministic targeting by score, minus a random policy baseline."""
+    n = len(score)
+    top = _top_count(n, phi)
+
+    target = np.zeros(n, dtype=bool)
+    if top > 0:
+        idx = np.argsort(score)[::-1][:top]
+        target[idx] = True
+
+    randomtarget = np.zeros(n, dtype=bool)
+    if top > 0:
+        randomtarget[rng.choice(n, size=top, replace=False)] = True
+
+    return float(np.sum(CATE[target]) - np.sum(CATE[randomtarget]))
+
+
+def _profit(
+    *,
+    epsilon: float,
+    CATE: np.ndarray,
+    CATE_estimates: np.ndarray,
+    phi: float,
+    rng: np.random.Generator,
+) -> float:
+    """Profit under randomized-response protected targeting, minus a random baseline."""
+    n = len(CATE_estimates)
+    top = _top_count(n, phi)
+
+    selection = np.zeros(n, dtype=bool)
+    if top > 0:
+        sorted_indices = np.argsort(CATE_estimates)[::-1]
+        threshold = CATE_estimates[sorted_indices[top - 1]]
+        selection = CATE_estimates >= threshold
+
+    randomized_response = rng.binomial(n=1, p=1 / (1 + np.exp(epsilon)), size=n).astype(bool)
+    selection[randomized_response] = ~selection[randomized_response]
+
+    targeted = np.flatnonzero(selection)
+    not_targeted = np.flatnonzero(~selection)
+    target_rr = np.zeros(n, dtype=bool)
+
+    if top < len(targeted):
+        target_rr[rng.choice(targeted, size=top, replace=False)] = True
+    else:
+        target_rr[targeted] = True
+        remaining = top - len(targeted)
+        if remaining > 0:
+            target_rr[rng.choice(not_targeted, size=remaining, replace=False)] = True
+
+    randomtarget = np.zeros(n, dtype=bool)
+    if top > 0:
+        randomtarget[rng.choice(n, size=top, replace=False)] = True
+
+    empirical_profit = np.sum(CATE[target_rr])
+    profit_random = np.sum(CATE[randomtarget])
+    return float(empirical_profit - profit_random)
+
+
+def _protect_cates_profit(
+    *,
+    percent: float,
+    CATE: np.ndarray,
+    CATE_estimates: np.ndarray,
+    epsilons: np.ndarray,
+    seed: int,
+) -> pd.DataFrame:
+    """Profit table for oracle, CTENN, DP policies, and the random baseline."""
+    rng = np.random.default_rng(seed)
+    phi = float(percent)
+
+    diff_real = _profit_nodp(CATE=CATE, score=CATE, phi=phi, rng=rng)
+    diff_tau = _profit_nodp(CATE=CATE, score=CATE_estimates, phi=phi, rng=rng)
+    diff_dp = [
+        _profit(
+            epsilon=float(eps),
+            CATE=CATE,
+            CATE_estimates=CATE_estimates,
+            phi=phi,
+            rng=rng,
+        )
+        for eps in epsilons
+    ]
+
+    return pd.DataFrame(
+        {
+            "percent": [phi] * (len(epsilons) + 3),
+            "epsilon": ["real", "CTENN", *[f"{float(eps):g}" for eps in epsilons], "random"],
+            "difference_from_random": [diff_real, diff_tau, *diff_dp, 0.0],
+        }
+    )
+
+
+def DP_policy(
+    iterations: int,
+    percentage: Any,
+    CATE: Any,
+    CATE_estimates: Any,
+    epsilons: Any,
+    seed_offset: int = 1,
+    verbose: bool = False,
+) -> pd.DataFrame:
+    """
+    Run repeated profit comparisons for CTENN and randomized-response protected CATEs.
+
+    Parameters
+    ----------
+    iterations:
+        Number of repeated randomized runs.
+    percentage:
+        Scalar or vector of targeting fractions.
+    CATE:
+        True/oracle CATE values used to evaluate realized profit.
+    CATE_estimates:
+        Estimated CATE scores used for CTENN and protected targeting.
+    epsilons:
+        Scalar or vector of randomized-response privacy levels.
+    seed_offset:
+        Offset used to seed each iteration as ``seed_offset + iteration``.
+    verbose:
+        Whether to print progress by iteration.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Columns: ``percent``, ``epsilon``, ``difference_from_random``, and ``iteration``.
+    """
+    CATE_arr = _as_1d_array(CATE, name="CATE").astype(float)
+    CATE_estimates_arr = _as_1d_array(CATE_estimates, name="CATE_estimates").astype(float)
+    percentage_arr = _as_probability_array(percentage, name="percentage")
+    epsilons_arr = _as_probability_array(epsilons, name="epsilons")
+
+    if len(CATE_arr) != len(CATE_estimates_arr):
+        raise ValueError("CATE and CATE_estimates must have the same length.")
+    if iterations < 1:
+        raise ValueError("iterations must be at least 1.")
+
+    frames = []
+    for iteration in range(1, int(iterations) + 1):
+        if verbose:
+            print(f"Iteration: {iteration}")
+        for percent in percentage_arr:
+            frame = _protect_cates_profit(
+                percent=float(percent),
+                CATE=CATE_arr,
+                CATE_estimates=CATE_estimates_arr,
+                epsilons=epsilons_arr,
+                seed=seed_offset + iteration,
+            )
+            frame["iteration"] = iteration
+            frames.append(frame)
+
+    return pd.concat(frames, ignore_index=True)
+
+
+__all__ = ["CTENN", "DP_CATE", "DP_policy"]
